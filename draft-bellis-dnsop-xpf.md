@@ -1,6 +1,6 @@
 ---
 title: EDNS X-Proxied-For
-docname: draft-bellis-dnsop-xpf-00
+docname: draft-bellis-dnsop-xpf-01-pre
 
 ipr: trust200902
 area: Internet
@@ -107,14 +107,19 @@ Address: The source IP address of the client.
 
 ##  Proxy Processing
 
-Proxies implementing this specification must append this option to each
-request packet received before forwarding it to the intended DNS server.
+Proxies MUST append this option to each request packet received before
+forwarding it to the intended DNS server.
+
+If this option is already present in an incoming request it MUST be
+stripped from the request unless the request was received from an
+upstream proxy that is white-listed by the receiving proxy, in which
+case the original value of the option MUST be preserved.
 
 If the proxy has to create a new OPT RR (because none was present in the
 original request) it MUST strip any OPT RR subsequently seen in the
 response for conformance with Section 7 of {{!RFC6891}}.
 
-Author's note: what are the implications of that for TSIG {{tsig}}?
+Author's note: what are the implications of the above for TSIG {{tsig}}?
 
 ##  Server Processing
 
@@ -122,9 +127,9 @@ This option MUST be ignored by servers when received from a client that
 is not white-listed by the server.
 
 When this option is received from a white-listed proxy, the DNS server
-MUST (SHOULD?) use the address contained therein in preference to the
-client's source IP address for any data processing logic that would
-otherwise depend on the latter.
+MUST (SHOULD?) use the address from the option contained therein in
+preference to the client's source IP address for any data processing
+logic that would otherwise depend on the latter.
 
 If the length of the client IP address contained in the OPTION-DATA is
 not consistent with that expected for the given IP version then the
