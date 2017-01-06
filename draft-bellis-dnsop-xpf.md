@@ -70,40 +70,40 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 
 ## EDNS Option Format
 
-The overall format of an EDNS option is shown for reference below,
-per {{!RFC6891}}, followed by the option specific data:
+This protocol uses an EDNS(0) {{!RFC6891}} option to include the original
+client source IP address in proxied DNS messages. The option is structured as
+follows:
 
+                 +0 (MSB)                            +1 (LSB)
        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
     0: |                          OPTION-CODE                          |
        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
     2: |                         OPTION-LENGTH                         |
        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-    4: |                                                               |
-       /                          OPTION-DATA                          /
-       /                                                               /
+    4: |                            FAMILY                             |
+       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    6: |                           ADDRESS...                          /
        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-OPTION-CODE: TBD, with mnemonic "XPF".
+* (Defined in {{!RFC6891}}) OPTION-CODE, 2 octets, for XPF is TBD (0xXX 0xXX).
 
-OPTION-LENGTH: Size (in octets) of OPTION-DATA.
+* (Defined in {{!RFC6891}}) OPTION-LENGTH, 2 octets, contains the length of the
+payload (everything after OPTION-LENGTH) in octets.
 
-OPTION-DATA: Option specific, as below:
+* FAMILY, 2 octets, indicates the family of the address contained in the
+option, using address family codes as assigned by IANA in Address Family
+Numbers {{Address_Family_Numbers}}.
 
-                    +0 (MSB)                            +1 (LSB)
-       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-    0: |     Unused    |   IP Version  |        Address Octet 0        |
-       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-    2: |        Address Octet 1        |              ...              |
-       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-       |              ...             ///                              |
-       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+The format of the address part depends on the value of FAMILY.  This document
+only defines the format for FAMILY 1 (IPv4) and FAMILY 2 (IPv6), which are as
+follows:
 
-Unused: Currently reserved.  These MUST be zero unless redefined in a
-subsequent specification.
+* ADDRESS, a fixed number of octets, contains either an IPv4 or IPv6 address,
+depending on FAMILY. For FAMILY 1 (IPv4), the ADDRESS field is 4 octets. For
+FAMILY 2 (IPv4), the ADDRESS field is 16 octets.
 
-IP Version: The IP protocol version number used by the client.
-
-Address: The source IP address of the client.
+All fields are in network byte order ("big-endian", per {{!RFC1700}}, Data
+Notations).
 
 ##  Proxy Processing
 
