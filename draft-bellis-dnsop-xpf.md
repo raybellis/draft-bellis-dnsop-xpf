@@ -1,6 +1,6 @@
 ---
 title: EDNS X-Proxied-For
-docname: draft-bellis-dnsop-xpf-01-pre
+docname: draft-bellis-dnsop-xpf-01
 
 ipr: trust200902
 area: Internet
