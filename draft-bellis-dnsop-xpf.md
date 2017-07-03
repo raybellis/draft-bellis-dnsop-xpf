@@ -1,6 +1,6 @@
 ---
-title: EDNS X-Proxied-For
-docname: draft-bellis-dnsop-xpf-01
+title: DNS X-Proxied-For
+docname: draft-bellis-dnsop-xpf-02
 
 ipr: trust200902
 area: Internet
@@ -29,11 +29,15 @@ author:
 
 normative:
   IANA-IP:
-    date: 2016-11-17
     author:
       org: IANA
     title: IANA IP Version Registry
     target: http://www.iana.org/assignments/version-numbers/
+  IANA-PROTO:
+    author:
+      org: IANA
+    title: IANA Protocol Number Registry
+    target: http://www.iana.org/assignments/protocol-numbers/
 
 --- abstract
 
@@ -41,9 +45,9 @@ It is becoming more commonplace to install front end proxy devices in
 front of DNS servers to provide (for example) load balancing or to
 perform transport layer conversions.
 
-This document defines an option within the EDNS(0) Extension Mechanism
-for DNS that allows a DNS server to receive the original client source
-IP address when supplied by trusted proxies.
+This document defines a meta resource record that allows a DNS server to
+receive information about the client's original transport protocol
+parameters when supplied by trusted proxies.
 
 --- middle
 
@@ -59,136 +63,163 @@ addresses from the server, making it harder to employ server-side
 technologies that rely on knowing those address (e.g. ACLs, DNS Response
 Rate Limiting, etc).
 
-This document defines an option within the EDNS(0) Extension Mechanism
-for DNS {{!RFC6891}} that allows a DNS server to receive the original
-client source IP address when supplied by trusted proxies.
+This document defines a DNS meta resource record (RR) that allows a DNS
+server to receive information about the client's original transport
+protocol parameters when supplied by trusted proxies.
 
 Whilst in some circumstances it would be possible to re-use the Client
-Subnet EDNS Option {{?RFC7871}} to carry this information, a new option
-is defined to allow both this option and the Client Subnet option to
-co-exist in the same packet.
+Subnet EDNS Option {{?RFC7871}} to carry a subset of this information, a
+new RR is defined to allow both this feature and the Client Subnet
+Option to co-exist in the same packet.
 
 # Terminology
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-"OPTIONAL" in this document are to be interpreted as described in
-"Key words for use in RFCs to Indicate Requirement Levels" {{!RFC2119}}.
+"OPTIONAL" in this document are to be interpreted as described in BCP 14
+{{!RFC2119}} {{!RFC8174}} when, and only when, they appear in all
+capitals, as shown here.
 
 The word "proxy" in this document means a network component that sits on
 the inbound query path in front of a recursive or authoritative DNS
 server, receiving DNS queries from clients and dispatching them to local
 servers.  This is to distinguish these from a "forwarder" since that
 term is usually understood to describe a network component that sits on
-the oubound query path of a client.
+the outbound query path of a client.
 
 # Description
 
-## EDNS Option Format
+The XPF RR contains the entire 5-tuple of (protocol, source address,
+destination address, source port and destination port) of the packet
+received from the client by the proxy.
 
-The overall format of an EDNS option is shown for reference below,
-per {{!RFC6891}}, followed by the option specific data:
+The presence of the source address supports use of ACLs based on the
+client's IP address.
 
-       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-    0: |                          OPTION-CODE                          |
-       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-    2: |                         OPTION-LENGTH                         |
-       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-    4: |                                                               |
-       /                          OPTION-DATA                          /
-       /                                                               /
-       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+The source port allows for ACLs to support Carrier Grade NAT whereby
+different end-users might share a single IP address.
 
-OPTION-CODE: TBD, with mnemonic "XPF".
+The destination address supports scenarios where the server behaviour
+depends upon the packet destination (e.g. BIND view's
+"match-destinations" option)
 
-OPTION-LENGTH: Size (in octets) of OPTION-DATA.
+The protocol and destination port fields allow server behaviour to vary
+depending on whether DNS over TLS {{?RFC7858}} or DNS over DTLS
+{{?RFC8094}} are in use.
 
-OPTION-DATA: Option specific, as below:
+##  Proxy Processing
+
+Proxies MUST append this RR to the Additional Section of each request
+packet received (and update the ARCOUNT field accordingly) before
+sending it to the intended DNS server.
+
+If this RR is already present in an incoming request it MUST be stripped
+from the request unless the request was received from an upstream proxy
+that is itself white-listed by the receiving proxy (i.e. if the proxies
+are configured in a multi-tier architecture), in which case the original
+value the RRs MUST be preserved.
+
+Where multiple XPF RRs to appear in a request their ordering MUST also
+be preserved.
+
+<< TODO: what about truncation on the client -> server path? >>
+
+##  Server Processing
+
+When this RR is received from a white-listed client the DNS server
+SHOULD use the transport information contained therein in preference to
+the packet's own transport information for any data processing logic
+(e.g.  ACLs) that would otherwise depend on the latter.
+
+If this RR is received from a non-white-listed client the server MUST
+return a REFUSED response.
+
+If a server finds this RR anywhere other than in the Additional Section
+of a request it MUST return a REFUSED response.
+
+If the value of the RR's IP version field is not understood by the
+server it MUST return a REFUSED response.
+
+If the length of the IP addresses contained in the RR are not consistent
+with that expected for the given IP version then the server MUST return
+a FORMERR response.
+
+Servers MUST NOT send this RR in DNS responses.
+
+## Wire Format {#wire}
+
+The XPF RR is formatted like any standard RR, but none of the fields
+except RDLENGTH and RDATA have any meaning in this specification.  All
+multi-octet fields are transmitted in network order (i.e. big-endian).
+
+The required values of the RR header fields are as follows:
+
+NAME: MUST contain a single 0 octet (i.e. the root domain).
+
+TYPE: MUST contain TBD1 (XPF).
+
+CLASS: MUST contain 1 (IN).
+
+TTL: MUST contain 0 (zero).
+
+RDLENGTH: specifies the length in octets of the RDATA field.
+
+The RDATA of the XPF RR is as follows:
 
                     +0 (MSB)                            +1 (LSB)
        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-    0: |     Unused    |   IP Version  |        Address Octet 0        |
+    0: |     Unused    |   IP Version  |           Protocol            |
        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
-    2: |        Address Octet 1        |              ...              |
+    2: |     Source Address Octet 0    |              ...              |
        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
        |              ...             ///                              |
        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+       |  Destination Address Octet 0  |              ...              |
+       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+       |              ...             ///                              |
+       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+       |                          Source Port                          |
+       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+       |                        Destination Port                       |
+       +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
 
-Unused: Currently reserved.  These MUST be zero unless redefined in a
-subsequent specification.
+Unused: Currently reserved.  These bits MUST be zero unless redefined in
+a subsequent specification.
 
 IP Version: The IP protocol version number used by the client, as
 defined in the IANA IP Version Number Registry {{IANA-IP}}.
 Implementations MUST support IPv4 (4) and IPv6 (6).
 
-Address: The source IP address of the client.
+Protocol: The Layer 4 protocol number (e.g. UDP or TCP) as defined in
+the IANA Protocol Number Registry {{IANA-PROTO}}.
 
-##  Proxy Processing
+Source Address: The source IP address of the client.
 
-Proxies MUST append this option to each request packet received before
-sending it to the intended DNS server.
+Destination Address: The destination IP address of the request, i.e. the
+IP address of the proxy on which the request was received.
 
-If this option is already present in an incoming request it MUST be
-stripped from the request unless the request was received from an
-upstream proxy that is itself white-listed by the receiving proxy (i.e.
-if the proxies are configured in a multi-tier architecture), in which
-case the original value of the option MUST be preserved.
+Source Port: The source port used by the client.
 
-If the proxy has to create a new OPT RR (because none was present in the
-original request) it MUST strip any OPT RR subsequently seen in the
-response for conformance with Section 7 of {{!RFC6891}}.
+Destination Port: The destination port of the request.
 
-##  Server Processing
+The length of the Source Address and Destination Address fields will be
+variable depending on the IP Version in use.
 
-When this option is received from a white-listed client the DNS server
-MUST (SHOULD?) use the address from the option contained therein in
-preference to the client's source IP address for any data processing
-logic that would otherwise depend on the latter.
+## Presentation Format
 
-If this option is received from a non-white-listed client the server
-MUST return a REFUSED response.
+Since this is a "meta" RR that cannot appear in master format zone files
+no presentation format is defined.
 
-If the IP version is not understood by the server it MUST return a
-REFUSED response.
+##  Signed DNS Requests {#signed}
 
-If the length of the client IP address contained in the OPTION-DATA is
-not consistent with that expected for the given IP version then the
-server MUST return a FORMERR response.
+Any XPF RRs found in a packet MUST be ignored for the purposes of
+verifying any signatures used for Secret Key Transaction Authentication
+for DNS {{!RFC2845}} or DNS Request and Transaction Signatures (SIG(0))
+{{!RFC2931}}.
 
-Servers MUST NOT send this option in DNS responses.
-
-##  Secret Key Transaction Authentication for DNS (TSIG) {#tsig}
-
-The considerations for TSIG {{!RFC2845}} from Section 4.5 of "DNS Proxy
-Implementation Guidelines" {{!RFC5625}} apply here.
-
-A TSIG-signed request MUST either:
-
-1.  be forwarded according to RFC 5625 without addition of this option,
-or
-
-2.  be verified using a secret shared between client and proxy, updated
-with this option, and then re-signed with a (potentially different)
-shared secret before sending to the server.
-
-In the case of option 1, the server might still be able to uniquely
-identify and authenticate the client through its shared key, but not by
-its IP address.
-
-If option 2 is used, there is an operational trade-off to be considered
-as to whether the two secrets (between client and proxy, and between
-proxy and server) are actually the same secret.  A potential advantage
-of three-way sharing of the secret is that if the server response
-requires no modifications it may be returned directly to the client
-without any further TSIG operations.
-
-Author's note: A third alternative exists, which is to append an
-additional TSIG signature to the packet based on a secret shared only
-between the proxy and server.  If end-to-end TSIG validation is required
-alongside TSIG validation between proxy and server, the server would
-have to 1) validate that second signature, 2) strip it, and then 3)
-perform further validation on the original signature.  Feedback is
-sought on whether this is worth pursuing.
+Similarly, if either TSIG or SIG(0) are configured between the proxy and
+server then any XPF RRs MUST be ignored when the proxy calculates the
+packet signature.
 
 # Security Considerations {#security}
 
@@ -204,7 +235,7 @@ the proxies' source addresses can be considered unspoofable.
 
 # Privacy Considerations
 
-Used incorrectly, this option could expose internal network information,
+Used incorrectly, this RR could expose internal network information,
 however it is not intended for use on proxy / forwarder devices that sit
 on the client-side of a DNS request.
 
@@ -213,11 +244,15 @@ that are under the same administrative control as the DNS servers
 themselves.  As such there is no change in the scope within which any
 private information might be shared.
 
+Use other than as described above would be contrary to the principles of
+{{!RFC6973}}.
+
 # IANA Considerations
 
-IANA are directed to assign the value TBD for the XPF option
-in the DNS EDNS0 Option Codes Registry.
+<< a copy of the RFC 6895 IANA RR TYPE application template will appear here >>
 
 # Acknowledgements
+
+Mark Andrews, Robert Edmonds, Duane Wessels
 
 --- back
