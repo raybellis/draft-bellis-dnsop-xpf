@@ -3,6 +3,7 @@ title: DNS X-Proxied-For
 docname: draft-bellis-dnsop-xpf-02
 
 ipr: trust200902
+updates: RFC 2845, RFC 2931 (if approved)
 area: Internet
 wg: DNSOP Working Group
 kw: Internet-Draft
