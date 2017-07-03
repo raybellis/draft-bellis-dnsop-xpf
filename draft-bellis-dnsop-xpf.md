@@ -82,7 +82,7 @@ perform transport layer conversions (e.g. to add DNS over TLS
 
 This has the unfortunate side effect of hiding the clients' source IP
 addresses from the server, making it harder to employ server-side
-technologies that rely on knowing those address (e.g. ACLs, DNS Response
+technologies that rely on knowing those addresses (e.g. ACLs, DNS Response
 Rate Limiting, etc).
 
 This document defines a DNS meta resource record (RR) that allows a DNS
