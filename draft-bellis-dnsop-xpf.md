@@ -26,6 +26,28 @@ author:
     country: USA
     phone: +1 650 423 1200
     email: ray@isc.org
+  -
+    ins: P. van Dijk
+    name: Peter van Dijk
+    org: PowerDNS.COM B.V.
+    abbrev: PowerDNS
+    street: ''
+    city: Den Haag
+    code: ''
+    country: The Netherlands
+    phone: ''
+    email: peter.van.dijk@powerdns.com
+  -
+    ins: R. Gacogne
+    name: Rémi Gacogne
+    org: PowerDNS.COM B.V.
+    abbrev: PowerDNS
+    street: ''
+    city: Den Haag
+    code: ''
+    country: The Netherlands
+    phone: ''
+    email: remi.gacogne@powerdns.com
 
 normative:
   IANA-IP:
