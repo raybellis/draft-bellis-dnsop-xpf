@@ -140,9 +140,9 @@ If this RR is already present in an incoming request it MUST be stripped
 from the request unless the request was received from an upstream proxy
 that is itself white-listed by the receiving proxy (i.e. if the proxies
 are configured in a multi-tier architecture), in which case the original
-value the RRs MUST be preserved.
+value of the RR MUST be preserved.
 
-Where multiple XPF RRs to appear in a request their ordering MUST also
+Where multiple XPF RRs appear in a request their ordering MUST also
 be preserved.
 
 << TODO: what about truncation on the client -> server path? >>
