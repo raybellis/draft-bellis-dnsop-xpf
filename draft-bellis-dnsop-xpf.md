@@ -230,8 +230,22 @@ variable depending on the IP Version in use.
 
 ## Presentation Format
 
-Since this is a "meta" RR that cannot appear in master format zone files
-no presentation format is defined.
+XPF is a meta RR that cannot appear in master format zone files, but a
+standardised presentation format is defined here for use by debugging
+utilities that might need to display the contents of an XPF RR.
+
+The Unused bits and the IP Version field are treated as a single octet
+and presented as an unsigned decimal integer with range 0 .. 255.
+
+The Protocol field is presented as an unsigned decimal integer with
+range 0 .. 255.
+
+The Source and Destination Address fields are presented either as IPv4
+or IPv6 addresses according to the IP Version field.  In the case of
+IPv6 the recommendations from {{?RFC5952}} SHOULD be followed.
+
+The Source and Destination Port fields are presented as unsigned
+decimal integers with range 0 .. 65535.
 
 ##  Signed DNS Requests {#signed}
 
@@ -272,7 +286,8 @@ Use other than as described above would be contrary to the principles of
 
 # IANA Considerations
 
-<< a copy of the RFC 6895 IANA RR TYPE application template will appear here >>
+<< a copy of the RFC 6895 IANA RR TYPE application template will appear
+here >>
 
 # Acknowledgements
 
