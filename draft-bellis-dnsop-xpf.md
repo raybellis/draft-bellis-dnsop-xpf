@@ -83,11 +83,11 @@ perform transport layer conversions (e.g. to add DNS over TLS
 
 This has the unfortunate side effect of hiding the clients' source IP
 addresses from the server, making it harder to employ server-side
-technologies that rely on knowing those addresses (e.g. ACLs, DNS Response
-Rate Limiting, etc).
+technologies that rely on knowing those addresses (e.g. ACLs, DNS
+Response Rate Limiting, etc).
 
-This document defines a DNS meta resource record (RR) that allows a DNS
-server to receive information about the client's original transport
+This document defines the XPF meta resource record (RR) that allows a
+DNS server to receive information about the client's original transport
 protocol parameters when supplied by trusted proxies.
 
 Whilst in some circumstances it would be possible to re-use the Client
@@ -103,12 +103,14 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 {{!RFC2119}} {{!RFC8174}} when, and only when, they appear in all
 capitals, as shown here.
 
-The word "proxy" in this document means a network component that sits on
-the inbound query path in front of a recursive or authoritative DNS
-server, receiving DNS queries from clients and dispatching them to local
-servers.  This is to distinguish these from a "forwarder" since that
-term is usually understood to describe a network component that sits on
-the outbound query path of a client.
+The XPF RR is analogous to the HTTP "X-Forwarded-For" header, but in DNS
+the term "forwarder" is usually understood to describe a network
+component that sits on the outbound query path of a resolver.
+
+Instead we use the term "proxy", which in this document means a network
+component that sits on the inbound query path in front of a recursive or
+authoritative DNS server, receiving DNS queries from clients and
+dispatching them to local servers.
 
 # Description
 
