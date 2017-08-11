@@ -252,11 +252,16 @@ decimal integers with range 0 .. 65535.
 ##  Signed DNS Requests {#signed}
 
 Any XPF RRs found in a packet MUST be ignored for the purposes of
-verifying any signatures used for Secret Key Transaction Authentication
-for DNS {{!RFC2845}} or DNS Request and Transaction Signatures (SIG(0))
-{{!RFC2931}}.
+calculating or verifying any signatures used for Secret Key Transaction
+Authentication for DNS {{!RFC2845}} or DNS Request and Transaction
+Signatures (SIG(0)) {{!RFC2931}}.
 
-Similarly, if either TSIG or SIG(0) are configured between the proxy and
+Typically it is expected that proxies will append the XPF RR to the
+packet after any existing TSIG or SIG(0) RRs, and that servers will
+remove the XPF RR from the packet the prior to verification of the
+original signature, with the ARCOUNT field updated as appropriate.
+
+If either TSIG or SIG(0) are configured between the proxy and
 server then any XPF RRs MUST be ignored when the proxy calculates the
 packet signature.
 
