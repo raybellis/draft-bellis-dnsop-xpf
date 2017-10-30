@@ -1,6 +1,6 @@
 ---
 title: DNS X-Proxied-For
-docname: draft-bellis-dnsop-xpf-02
+docname: draft-bellis-dnsop-xpf-03
 
 ipr: trust200902
 updates: RFC 2845, RFC 2931 (if approved)
@@ -228,7 +228,7 @@ Source Port: The source port used by the client.
 Destination Port: The destination port of the request.
 
 The length of the Source Address and Destination Address fields will be
-variable depending on the IP Version in use.
+variable depending on the IP Version used by the client.
 
 ## Presentation Format
 
