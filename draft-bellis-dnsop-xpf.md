@@ -114,9 +114,9 @@ dispatching them to local servers.
 
 # Description
 
-The XPF RR contains the entire 5-tuple of (protocol, source address,
-destination address, source port and destination port) of the packet
-received from the client by the proxy.
+The XPF RR contains the entire 6-tuple (IP version, Layer 4 protocol,
+source address, destination address, source port and destination port)
+of the packet received from the client by the proxy.
 
 The presence of the source address supports use of ACLs based on the
 client's IP address.
@@ -132,29 +132,15 @@ The protocol and destination port fields allow server behaviour to vary
 depending on whether DNS over TLS {{?RFC7858}} or DNS over DTLS
 {{?RFC8094}} are in use.
 
-##  Proxy Processing
+## Client Handling
 
-Proxies MUST append this RR to the Additional Section of each request
-packet received (and update the ARCOUNT field accordingly) before
-sending it to the intended DNS server.
+Stub resolvers, client-side proxy devices, and recursive resolvers MUST
+NOT add the XPF RR to DNS requests.
 
-If this RR is already present in an incoming request it MUST be stripped
-from the request unless the request was received from an upstream proxy
-that is itself white-listed by the receiving proxy (i.e. if the proxies
-are configured in a multi-tier architecture), in which case the original
-value of the RR MUST be preserved.
+## Request Handling
 
-Where multiple XPF RRs appear in a request their ordering MUST also
-be preserved.
-
-<< TODO: what about truncation on the client -> server path? >>
-
-##  Server Processing
-
-When this RR is received from a white-listed client the DNS server
-SHOULD use the transport information contained therein in preference to
-the packet's own transport information for any data processing logic
-(e.g.  ACLs) that would otherwise depend on the latter.
+The rules in this section apply to processing of the XPF RR whether by a
+proxy device or a DNS server.
 
 If this RR is received from a non-white-listed client the server MUST
 return a REFUSED response.
@@ -170,6 +156,23 @@ with that expected for the given IP version then the server MUST return
 a FORMERR response.
 
 Servers MUST NOT send this RR in DNS responses.
+
+## Proxy Handling
+
+For each request received, proxies MUST generate an XPF RR containing
+the 6-tuple representing the client's Layer 3 and Layer 4 headers and
+append it to the Additional Section of the request (updating the ARCOUNT
+field accordingly) before sending it to the intended DNS server.
+
+If a valid XPF RR is received from a white-listed client the original
+XPF RR MUST be preserved instead.
+
+## Server Handling
+
+When this RR is received from a white-listed client the DNS server
+SHOULD use the transport information contained therein in preference to
+the packet's own transport information for any data processing logic
+(e.g. ACLs) that would otherwise depend on the latter.
 
 ## Wire Format {#wire}
 
@@ -258,8 +261,8 @@ Signatures (SIG(0)) {{!RFC2931}}.
 
 Typically it is expected that proxies will append the XPF RR to the
 packet after any existing TSIG or SIG(0) RRs, and that servers will
-remove the XPF RR from the packet the prior to verification of the
-original signature, with the ARCOUNT field updated as appropriate.
+remove the XPF RR from the packet prior to verification of the original
+signature, with the ARCOUNT field updated as appropriate.
 
 If either TSIG or SIG(0) are configured between the proxy and
 server then any XPF RRs MUST be ignored when the proxy calculates the
