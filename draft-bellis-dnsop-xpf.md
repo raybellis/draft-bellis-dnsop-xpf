@@ -316,6 +316,11 @@ Support for extracting the XPF RR from received packets (when coming from a
 trusted source) is available in the git version of the PowerDNS Recursor. The
 code point is configurable.
 
+## Wireshark
+
+Support for dissecting XPF RRs is present in Wireshark 2.5.0, using a
+temporary code point of 65422.
+
 # Privacy Considerations
 
 Used incorrectly, this RR could expose internal network information,
