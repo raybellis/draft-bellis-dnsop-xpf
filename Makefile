@@ -92,7 +92,7 @@ tag:
 
 ## Recipes
 
-.INTERMEDIATE: $(draft).xml
+.SECONDARY: $(draft).xml
 %.xml: %.md
 	$(kramdown-rfc2629) $< > $@
 
