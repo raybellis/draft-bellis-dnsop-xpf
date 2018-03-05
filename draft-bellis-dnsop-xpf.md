@@ -280,7 +280,10 @@ example the network architecture keeps all proxy-to-server traffic on a
 dedicated network and clients have no direct access to the servers then
 the proxies' source addresses can be considered unspoofable.
 
-# Implementation status - RFC EDITOR: REMOVE BEFORE PUBLICATION {#impstatus}
+# Implementation status {#impstatus}
+
+[RFC Editor Note: Please remove this entire section prior to
+publication as an RFC.]
 
 This section records the status of known implementations of the
 protocol defined by this specification at the time of posting of
