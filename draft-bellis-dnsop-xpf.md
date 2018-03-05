@@ -319,11 +319,11 @@ code point is configurable.
 ## Wireshark
 
 Support for dissecting XPF RRs is present in Wireshark 2.5.0, using a
-temporary code point of 65422.
+temporary code point.
 
 ## tcpdump
 
-A third party patch for tcpdump exists, using a temporary code point of 65422.
+A third party patch for tcpdump exists, using a temporary code point.
 
 # Privacy Considerations
 
