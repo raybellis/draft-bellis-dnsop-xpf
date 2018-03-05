@@ -346,6 +346,6 @@ here >>
 
 # Acknowledgements
 
-Mark Andrews, Robert Edmonds, Duane Wessels
+Mark Andrews, Robert Edmonds, Duane Wessels, Job Snijders, Arjen Zonneveld.
 
 --- back
