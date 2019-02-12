@@ -1,0 +1,69 @@
+A. Submission Date:  2017-07-21
+
+B.1 Submission Type:  [X] New RRTYPE  [ ] Modification to RRTYPE
+B.2 Kind of RR:  [ ] Data RR  [X] Meta-RR
+
+C. Contact Information for submitter (will be publicly posted):
+   Name: Ray Bellis                 Email Address: ray@isc.org
+   International telephone number:  +1 650 423 1423
+   Other contact handles:
+
+D. Motivation for the new RRTYPE application.
+   Please keep this part at a high level to inform the Expert and
+   reviewers about uses of the RRTYPE.  Most reviewers will be DNS
+   experts that may have limited knowledge of your application space.
+
+   The proposed RR is a meta-RR that allows a back-end server that
+   has a load-balancer or proxy sat in front of it to receive the
+   original DNS request's transport protocol 5-tuple so that it
+   can enforce ACLs, pick views, etc.
+
+E. Description of the proposed RR type.
+   This description can be provided in-line in the template, as an
+   attachment, or with a publicly available URL.
+
+   See draft-bellis-dnsop-xpf-03.
+
+   NB: Whilst further updates to the draft text are likely, the RR
+   format is considered stable.
+
+F. What existing RRTYPE or RRTYPEs come closest to filling that need
+   and why are they unsatisfactory?
+
+   No existing RRTYPE fills that need.  An earlier version of the
+   specification attempted to use EDNS, but the interaction with TSIG
+   and SIG(0) was too onerous.  It was also problematic to add an OPT RR
+   when one wasn't already present, since it would that the OPT RR
+   in the response be stripped out in order to comply with RFC 6891.
+
+G. What mnemonic is requested for the new RRTYPE (optional)?
+
+   Note: If a mnemonic is not supplied, not allowed, or duplicates an
+   existing RRTYPE or CLASS mnemonic, the Expert will assign a
+   mnemonic.
+
+   The requested mnemonic is "XPF".
+
+H. Does the requested RRTYPE make use of any existing IANA registry
+   or require the creation of a new IANA subregistry in DNS
+   Parameters?  If so, please indicate which registry is to be used
+   or created.  If a new subregistry is needed, specify the
+   allocation policy for it and its initial contents.  Also include
+   what the modification procedures will be.
+
+   No registry changes are required.
+
+I. Does the proposal require/expect any changes in DNS
+   servers/resolvers that prevent the new type from being processed
+   as an unknown RRTYPE (see [RFC3597])?
+
+   Strictly speaking, there is a minor change in so much as the parties
+   are required to ignore this RR when calculating TSIG or SIG(0) packet
+   signatures.  However since this RR is a hop-by-hop meta-RR that
+   should only appear when specifically configured between systems that
+   are under the same administrative control there should be no need to
+   consider end-to-end transparency.  If someone attempts to send an XPF
+   RR over a TSIG-signed channel to a server that doesn't understand XPF
+   the packet verification will fail.
+
+J. Comments:
