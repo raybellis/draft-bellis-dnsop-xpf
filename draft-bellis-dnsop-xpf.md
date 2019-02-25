@@ -3,7 +3,7 @@ title: DNS X-Proxied-For
 docname: draft-bellis-dnsop-xpf-04
 
 ipr: trust200902
-updates: RFC 2845, RFC 2931 (if approved)
+updates: RFC 2845, RFC 2931
 area: Internet
 wg: DNSOP Working Group
 kw: Internet-Draft
@@ -282,8 +282,8 @@ the proxies' source addresses can be considered unspoofable.
 
 # Implementation status {#impstatus}
 
-[RFC Editor Note: Please remove this entire section prior to
-publication as an RFC.]
+<< RFC Editor Note: Please remove this entire section prior to
+publication as an RFC. >>
 
 This section records the status of known implementations of the
 protocol defined by this specification at the time of posting of
