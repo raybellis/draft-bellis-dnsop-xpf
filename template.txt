@@ -33,7 +33,7 @@ F. What existing RRTYPE or RRTYPEs come closest to filling that need
    No existing RRTYPE fills that need.  An earlier version of the
    specification attempted to use EDNS, but the interaction with TSIG
    and SIG(0) was too onerous.  It was also problematic to add an OPT RR
-   when one wasn't already present, since it would that the OPT RR
+   when one wasn't already present, since it would require that the OPT RR
    in the response be stripped out in order to comply with RFC 6891.
 
 G. What mnemonic is requested for the new RRTYPE (optional)?
