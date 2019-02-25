@@ -307,13 +307,13 @@ to use this information as they see fit".
 
 ## dnsdist
 
-Support for adding an XPF RR to proxied packets is provided in the git version of
-dnsdist. The code point is configurable.
+Support for adding an XPF RR to proxied packets is present in
+dnsdist 1.3.0. The code point is configurable.
 
 ## PowerDNS Recursor
 
-Support for extracting the XPF RR from received packets (when coming from a
-trusted source) is available in the git version of the PowerDNS Recursor. The
+Support for extracting the XPF RR from received packets (when coming
+from a trusted source) is available in PowerDNS Recursor v4.2.0. The
 code point is configurable.
 
 ## Wireshark
