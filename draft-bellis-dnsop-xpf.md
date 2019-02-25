@@ -341,8 +341,8 @@ Use other than as described above would be contrary to the principles of
 
 # IANA Considerations
 
-<< a copy of the RFC 6895 IANA RR TYPE application template will appear
-here >>
+IANA has assigned a value of TBD for the XPF record in the
+Resource Record Type table of the DNS Parameters Registry.
 
 # Acknowledgements
 
