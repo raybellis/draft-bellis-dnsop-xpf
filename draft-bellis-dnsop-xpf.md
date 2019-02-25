@@ -346,6 +346,8 @@ Resource Record Type table of the DNS Parameters Registry.
 
 # Acknowledgements
 
-Mark Andrews, Robert Edmonds, Duane Wessels, Job Snijders, Arjen Zonneveld.
+The authors would like to thank the following for their feedback on this
+document: Mark Andrews, Robert Edmonds, Duane Wessels, Job Snijders,
+Arjen Zonneveld.
 
 --- back
